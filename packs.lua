@@ -34,6 +34,7 @@ local commerceWindow
 local commerceUIInitialized = false
 
 local currentBackSlotItem
+local cachedPlayerName
 local lastKnownZone
 local currentZone
 
@@ -390,6 +391,11 @@ end
 local function traderDialogOpened(refund, itemType, itemGrade, coinType)
     -- api.Log:Info(tostring(itemType) .. " turns in for " .. tostring(refund) .. " of coinType: " .. tostring(coinType))
     currentBackSlotItem = itemType
+    refund = refund * 1.08
+    local backpackInfo = api.Equipment:GetEquippedItemTooltipInfo(EQUIP_SLOT.BACKPACK)
+    if backpackInfo and backpackInfo.crafter and backpackInfo.crafter ~= cachedPlayerName then
+        refund = refund * 0.8
+    end
     lastSeenPrice = refund
     lastSeenCoinType = coinType
 end
@@ -666,6 +672,7 @@ local function OnLoad()
     yourPaystubWindow = api.Interface:CreateEmptyWindow("yourPaystubWindow", "UIParent")
     
     -- Initializing addon-level variables
+    cachedPlayerName = api.Unit:GetUnitNameById(api.Unit:GetUnitId("player"))
     currentBackSlotItem = nil
     lastKnownZone = nil
     currentZone = nil
